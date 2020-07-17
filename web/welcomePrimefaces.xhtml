@@ -1,0 +1,180 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+    <f:view contentType="text/html">
+        <h:head>
+            <f:facet name="first">
+                <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+                <title>PrimeFaces</title>
+            </f:facet>
+        </h:head>
+
+        <h:body>
+
+            <p:layout fullPage="true">
+
+                <p:layoutUnit position="north" size="100" resizable="true" closable="true" collapsible="true">
+                    <style type="text/css">
+                        .ui-panel {
+                            margin: 15px;
+                            width: 300px;
+                        }
+                    </style>
+
+
+                    <p:panel id="pnl" header="Draggable Panel">
+                        <h:outputText value="I am actually a regular p:panel." />
+                    </p:panel>
+                    <p:draggable for="pnl" />
+
+                    <p:panel id="handlepnl" header="Handle">
+                        <h:outputText value="I can only be dragged with my header." />
+                    </p:panel>
+                    <p:draggable for="handlepnl" handle=".ui-panel-titlebar" />
+
+                    <p:panel id="hpnl" header="Horizontal Only">
+                        <h:outputText value="I can only be dragged horizontally." />
+                    </p:panel>
+                    <p:draggable for="hpnl" axis="x" />
+
+                    <p:panel id="vpnl" header="Vertical Only">
+                        <h:outputText value="I can only be dragged vertically" />
+                    </p:panel>
+                    <p:draggable for="vpnl" axis="y" />
+
+                    <p:panel id="rpnl" header="Revert">
+                        <h:outputText value="I will be reverted back to my original position" />
+                    </p:panel>
+                    <p:draggable for="rpnl" revert="true" />
+
+                    <p:panel id="opnl" header="Opacity">
+                        <h:outputText value="My opacity is lower when I'm being dragged" />
+                    </p:panel>
+                    <p:draggable for="opnl" opacity="0.3" />
+
+                    <p:panel id="gpnl" header="Grid">
+                        <h:outputText value="I am dragged in grid mode" />
+                    </p:panel>
+                    <p:draggable for="gpnl" grid="20,40" />
+
+                    <p:outputPanel id="restrictPanel" layout="block" style="width:400px;height:200px;border:1px solid #666666;margin-bottom:20px">
+                        <p:panel id="conpnl" header="Restricted">
+                            <h:outputText value="I am restricted to my parent's boundaries" />
+                        </p:panel>
+                    </p:outputPanel>
+                    <p:draggable for="conpnl" containment="parent" />
+
+                    <p:graphicImage id="pic" name="demo/images/nature/nature10.jpg" />
+                    <p:draggable for="pic" />
+                </p:layoutUnit>
+
+                <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
+                    Footer
+                </p:layoutUnit>
+
+                <p:layoutUnit position="west" size="175" header="Left" collapsible="true">
+                    <p:menu>
+                        <p:submenu label="Resources">
+                            <p:menuitem value="Demo" url="http://www.primefaces.org/showcase-labs/ui/home.jsf" />
+                            <p:menuitem value="Documentation" url="http://www.primefaces.org/documentation.html" />
+                            <p:menuitem value="Forum" url="http://forum.primefaces.org/" />
+                            <p:menuitem value="Themes" url="http://www.primefaces.org/themes.html" />
+
+                        </p:submenu>
+
+                    </p:menu>
+                </p:layoutUnit>
+
+                <p:layoutUnit position="center">
+                    <script type="text/javascript">
+                        function handleDrop(event, ui) {
+                            var droppedCar = ui.draggable;
+
+                            droppedCar.fadeOut('fast');
+                        }
+                    </script>
+
+
+                    <h:form id="carForm">
+                        <p:fieldset id="availableCarsField" legend="AvailableCars">
+                            <p:dataGrid id="availableCars" var="car" value="#{dndCarsView.cars}" columns="3">
+                                <p:panel id="pnl" header="#{car.id}" style="text-align:center">
+                                    <h:panelGrid columns="1" style="width:100%">
+                                        <p:graphicImage name="/demo/images/car/#{car.brand}.gif" />
+                                    </h:panelGrid>
+                                </p:panel>
+
+                                <p:draggable for="pnl" revert="true" handle=".ui-panel-titlebar" stack=".ui-panel"/>
+                            </p:dataGrid>
+                        </p:fieldset>
+
+                        <p:fieldset id="selectedCars" legend="Selected Cars" style="margin-top:20px">
+                            <p:outputPanel id="dropArea">
+                                <h:outputText value="!!!Drop here!!!" rendered="#{empty dndCarsView.droppedCars}" style="font-size:24px;" />
+                                <p:dataTable id="selectedCarsTable" var="car" value="#{dndCarsView.droppedCars}" rendered="#{not empty dndCarsView.droppedCars}">
+                                    <p:column headerText="Id">
+                                        <h:outputText value="#{car.id}" />
+                                    </p:column>
+
+                                    <p:column headerText="Year">
+                                        <h:outputText value="#{car.year}" />
+                                    </p:column>
+
+                                    <p:column headerText="Brand">
+                                        <h:outputText value="#{car.brand}" />
+                                    </p:column>
+
+                                    <p:column headerText="Color">
+                                        <h:outputText value="#{car.color}" />
+                                    </p:column>
+
+                                    <p:column style="width:32px">
+                                        <p:commandButton update=":carForm:display" oncomplete="PF('carDialog').show()" icon="pi pi-search">
+                                            <f:setPropertyActionListener value="#{car}" target="#{dndCarsView.selectedCar}" />
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
+                            </p:outputPanel>
+                        </p:fieldset>
+
+                        <p:droppable for="selectedCars" tolerance="touch" activeStyleClass="ui-state-highlight" datasource="availableCars" onDrop="handleDrop">
+                            <p:ajax listener="#{dndCarsView.onCarDrop}" update="dropArea availableCars" />
+                        </p:droppable>
+
+                        <p:dialog header="Car Detail" widgetVar="carDialog" resizable="false" draggable="false"
+                                  showEffect="fade" hideEffect="fade" modal="true">
+
+                            <p:outputPanel id="display">
+                                <h:panelGrid columns="2" cellpadding="5" rendered="#{not empty dndCarsView.selectedCar}">
+                                    <f:facet name="header">
+                                        <p:graphicImage name="/demo/images/car/#{dndCarsView.selectedCar.brand}.gif"/>
+                                    </f:facet>
+
+                                    <h:outputText value="Id" />
+                                    <h:outputText value="#{dndCarsView.selectedCar.id}" style="font-weight:bold"/>
+
+                                    <h:outputText value="Year:" />
+                                    <h:outputText value="#{dndCarsView.selectedCar.year}" style="font-weight:bold"/>
+
+                                    <h:outputText value="Brand" />
+                                    <h:outputText value="#{dndCarsView.selectedCar.brand}" style="font-weight:bold"/>
+
+                                    <h:outputText value="Color:" />
+                                    <h:outputText value="#{dndCarsView.selectedCar.color}" style="font-weight:bold"/>
+                                </h:panelGrid>
+                            </p:outputPanel>
+                        </p:dialog>
+                    </h:form>
+                </p:layoutUnit>
+
+            </p:layout>
+
+        </h:body>
+
+    </f:view>
+</html>
+
